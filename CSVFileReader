@@ -1,0 +1,36 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+using namespace std;
+
+void readCSVFile(const char* filepath){
+    ifstream file(filepath);
+    if(file.is_open()){
+        string lineFromFile;
+        getline(file, lineFromFile); //skips that first line
+    while(!file.eof()) {
+        getline(file, lineFromFile);
+        istringstream stream(lineFromFile);
+        string dateOfUpdate, County, State, Fips, caseCount, deathCount;
+        getline(stream, dateOfUpdate, ',');
+        getline(stream, County, ',');
+        getline(stream, State, ',');
+        getline(stream, Fips, ',');
+        getline(stream, caseCount, ',');
+        getline(stream, deathCount, ',');
+        string date = dateOfUpdate;
+        //I don't think we want to use this but I included it to traverse the line as a whole
+        string county = County;
+        string state = State;
+        int fips = stoi(Fips);
+        int cases = stoi(caseCount);
+        int deaths = stoi(deathCount);
+        //insert them into BST and HASH MAP
+        }
+    }
+}
+
+int main(){
+    readCSVFile("nameofCSVfile");
+}

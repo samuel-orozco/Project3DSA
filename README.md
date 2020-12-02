@@ -23,6 +23,7 @@ us various data points and information regarding COVID cases in a specific count
 
 Data: We will be using a COVID-19 case data repository that updates daily based off of data
 given by the CDC. https://github.com/nytimes/covid-19-data
+https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv 
 
 Tools: We will be coding this entire project in C++. We will also be using Excel, powerpoint, and
 Procreate (for images, logos, and aesthetics)

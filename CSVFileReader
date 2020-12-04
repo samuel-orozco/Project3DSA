@@ -2,10 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-<<<<<<< HEAD
-=======
 #include <unordered_map>
->>>>>>> first commit kenz
 using namespace std;
 
 struct Node {
@@ -21,8 +18,6 @@ struct Node {
     Node* left = nullptr;
     Node* right = nullptr;
 };
-<<<<<<< HEAD
-=======
 
 
 struct mapNode //had to make separate node because didn't need pointers
@@ -38,7 +33,6 @@ struct mapNode //had to make separate node because didn't need pointers
 };
 
 
->>>>>>> first commit kenz
 Node* BSTinsert(Node* root, Node temp);
 int max(int left, int right);
 int height(Node* root);
@@ -46,15 +40,6 @@ int BalanceFactor(Node* root);
 Node* rotateLeft(Node* root); // left rotate of AVL Tree
 Node* rotateRight(Node* root); // right rotate of AVL Tree
 
-<<<<<<< HEAD
-
-void readCSVFile(const char* filepath, Node* root);
-
-int main() {
-    Node* root = nullptr;
-    
-    readCSVFile("nameofCSVfile", root);
-=======
 void readCSVFile(const char* filepath, Node* root);
 
 
@@ -64,7 +49,6 @@ int main() {
     unordered_map<string, mapNode> covidTracker; //using county as key
     
     readCSVFile("nameofCSVfile", root, covidTracker);
->>>>>>> first commit kenz
 
     bool isRunning = true;
     int choice;
@@ -103,11 +87,7 @@ int main() {
     return 0;
 }
 
-<<<<<<< HEAD
-void readCSVFile(const char* filepath, Node* root) {
-=======
 void readCSVFile(const char* filepath, Node* root, unordered_map& m) {
->>>>>>> first commit kenz
     ifstream file(filepath);
     if (file.is_open()) {
         string lineFromFile;

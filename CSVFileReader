@@ -20,7 +20,7 @@ void readCSVFile(const char* filepath){
         getline(stream, caseCount, ',');
         getline(stream, deathCount, ',');
         string date = dateOfUpdate;
-        //I don't think we want to use this but I included it to traverse the line as a whole
+        // I don't think we want to use this but I included it to traverse the line as a whole
         string county = County;
         string state = State;
         int fips = stoi(Fips);
@@ -33,4 +33,6 @@ void readCSVFile(const char* filepath){
 
 int main(){
     readCSVFile("nameofCSVfile");
+
+    return 0;
 }

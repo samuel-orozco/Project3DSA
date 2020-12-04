@@ -5,48 +5,32 @@
 using namespace std;
 
 struct Node {
-    string county;
-    string state;
-    string date;
-    int fips;
-    int cases;
-    int deaths;
+    string county = "";
+    string state = "";
+    string date = "";
+    int fips = 0;
+    int cases = 0;
+    int deaths = 0;
+
+    // Caden's part for BST tree
+    int BF = 0;
+    Node* left = nullptr;
+    Node* right = nullptr;
 };
+Node* BSTinsert(Node* root, Node temp);
+int max(int left, int right);
+int height(Node* root);
+int BalanceFactor(Node* root);
+Node* rotateLeft(Node* root); // left rotate of AVL Tree
+Node* rotateRight(Node* root); // right rotate of AVL Tree
 
-void readCSVFile(const char* filepath) {
-    ifstream file(filepath);
-    if (file.is_open()) {
-        string lineFromFile;
-        getline(file, lineFromFile); //skips that first line
-        while (!file.eof()) {
-            getline(file, lineFromFile);
-            istringstream stream(lineFromFile);
-            string dateOfUpdate, County, State, Fips, caseCount, deathCount;
-            getline(stream, dateOfUpdate, ',');
-            getline(stream, County, ',');
-            getline(stream, State, ',');
-            getline(stream, Fips, ',');
-            getline(stream, caseCount, ',');
-            getline(stream, deathCount, ',');
-            
-            // I don't think we want to use this but I included it to traverse the line as a whole
-            
-            Node temp;
-            temp.date = dateOfUpdate;
-            temp.county = County;
-            temp.state = State;
-            temp.fips = stoi(Fips);
-            temp.cases = stoi(caseCount);
-            temp.deaths = stoi(deathCount);
 
-            // only need to insert node into data structure
-            //insert them into BST and HASH MAP
-        }
-    }
-}
+void readCSVFile(const char* filepath, Node* root);
 
 int main() {
-    readCSVFile("nameofCSVfile");
+    Node* root = nullptr;
+    
+    readCSVFile("nameofCSVfile", root);
 
     bool isRunning = true;
     int choice;
@@ -85,3 +69,107 @@ int main() {
     return 0;
 }
 
+void readCSVFile(const char* filepath, Node* root) {
+    ifstream file(filepath);
+    if (file.is_open()) {
+        string lineFromFile;
+        getline(file, lineFromFile); //skips that first line
+        while (!file.eof()) {
+            getline(file, lineFromFile);
+            istringstream stream(lineFromFile);
+            string dateOfUpdate, County, State, Fips, caseCount, deathCount;
+            getline(stream, dateOfUpdate, ',');
+            getline(stream, County, ',');
+            getline(stream, State, ',');
+            getline(stream, Fips, ',');
+            getline(stream, caseCount, ',');
+            getline(stream, deathCount, ',');
+
+            Node temp;
+            temp.date = dateOfUpdate;
+            temp.county = County;
+            temp.state = State;
+            temp.fips = stoi(Fips);
+            temp.cases = stoi(caseCount);
+            temp.deaths = stoi(deathCount);
+
+            // only need to insert node into data structure
+            //insert them into BST and HASH MAP
+
+
+            root = BSTinsert(root, temp);
+
+
+        }
+    }
+}
+
+Node* BSTinsert(Node* root, Node temp){
+    //normal insert of BST
+    if (root == nullptr) {
+        return new Node(temp);
+    }
+    if (temp.fips < root->fips)
+        root->left = BSTinsert(root->left, temp);
+    else if (temp.fips > root->fips)
+        root->right = BSTinsert(root->right, temp);
+    else { // Can't have dupluicate ID's
+        //cout << "unsuccessful" << endl;
+        return root;
+    }
+
+    //Balance the AVL Tree
+    root->BF = BalanceFactor(root);
+
+    if (root->BF > 1 && temp.fips < root->left->fips) { // Left Left Case
+        root = rotateRight(root);
+        return root;
+    }
+    if (root->BF < -1 && temp.fips > root->right->fips) { // Right Right Case
+        root = rotateLeft(root);
+        return root;
+    }
+    if (root->BF > 1 && temp.fips > root->left->fips) { // Left Right Case
+        root->left = rotateLeft(root->left);
+        root = rotateRight(root);
+        return root;
+    }
+    if (root->BF < -1 && temp.fips < root->right->fips) { // Right Left Case
+        root->right = rotateLeft(root->right);
+        root = rotateLeft(root);
+        return root;
+    }
+    return root;
+}
+
+int max(int left, int right) { // finds max of 2 numbers
+    if (left > right)
+        return left;
+    return right;
+}
+
+int height(Node* root) { // finds height of node -> Height = 1 + max(Height(children))
+    if (root == nullptr)
+        return 0;
+    return (1 + max(height(root->left), height(root->right)));
+}
+
+int BalanceFactor(Node* root) { // calculate balance factor of node
+    return (height(root->left) - height(root->right));
+}
+
+Node* rotateLeft(Node* root) { // left rotate of AVL Tree
+    Node* grandchild = root->right->left;
+    Node* newParent = root->right;
+    newParent->left = root;
+    root->right = grandchild;
+    return newParent;
+}
+
+Node* rotateRight(Node* root) { // right rotate of AVL Tree
+    Node* grandchild = root->left->right;
+    Node* newParent = root->left;
+    newParent->right = root;
+    root->left = grandchild;
+    return newParent;
+}

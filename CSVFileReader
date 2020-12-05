@@ -6,17 +6,19 @@
 using namespace std;
 
 struct Node {
-    string county = "";
-    string state = "";
-    string date = "";
-    int fips = 0;
-    int cases = 0;
-    int deaths = 0;
+	string county;
+	string state;
+	string date;
+	int fips;
+	int cases;
+	int deaths;
 
-    // Caden's part for BST tree
-    int BF = 0;
-    Node* left = nullptr;
-    Node* right = nullptr;
+	// Caden's part for BST tree
+	int BF = 0;
+	Node* left = nullptr;
+	Node* right = nullptr;
+	Node() : county(""), state(""), date(""), fips(0), cases(0), deaths(0), BF(0), left(nullptr), right(nullptr) {}
+	Node(string ct, string s, string d, int f, int c, int x) : county(ct), state(s), date(d), fips(f), cases(c), deaths(x), BF(0), left(nullptr), right(nullptr) {}
 };
 
 
@@ -40,7 +42,7 @@ int BalanceFactor(Node* root);
 Node* rotateLeft(Node* root); // left rotate of AVL Tree
 Node* rotateRight(Node* root); // right rotate of AVL Tree
 
-void readCSVFile(const char* filepath, Node* root);
+void readCSVFile(const char* filepath, Node* &root, unordered_map& m);
 
 
 int main() {
@@ -87,7 +89,7 @@ int main() {
     return 0;
 }
 
-void readCSVFile(const char* filepath, Node* root, unordered_map& m) {
+void readCSVFile(const char* filepath, Node* &root, unordered_map& m) {
     ifstream file(filepath);
     if (file.is_open()) {
         string lineFromFile;
@@ -121,42 +123,44 @@ void readCSVFile(const char* filepath, Node* root, unordered_map& m) {
     }
 }
 
-Node* BSTinsert(Node* root, Node temp){
-    //normal insert of BST
-    if (root == nullptr) {
-        return new Node(temp);
-    }
-    if (temp.fips < root->fips)
-        root->left = BSTinsert(root->left, temp);
-    else if (temp.fips > root->fips)
-        root->right = BSTinsert(root->right, temp);
-    else { // Can't have dupluicate ID's
-        //cout << "unsuccessful" << endl;
-        return root;
-    }
+Node* BSTinsert(Node* root, Node temp) {
+	//normal insert of BST
+	if (root == nullptr) {
+		return new Node(temp.county, temp.state, temp.date, temp.fips, temp.cases, temp.deaths);
+	}
+	if (temp.fips < root->fips)
+		root->left = BSTinsert(root->left, temp);
+	else if (temp.fips > root->fips)
+		root->right = BSTinsert(root->right, temp);
+	else {
+		root->cases = temp.cases;
+		root->deaths = temp.deaths;
+		root->date = temp.date;
+		return root;
+	}
+	/*
+	//Balance the AVL Tree
+	root->BF = BalanceFactor(root);
 
-    //Balance the AVL Tree
-    root->BF = BalanceFactor(root);
-
-    if (root->BF > 1 && temp.fips < root->left->fips) { // Left Left Case
-        root = rotateRight(root);
-        return root;
-    }
-    if (root->BF < -1 && temp.fips > root->right->fips) { // Right Right Case
-        root = rotateLeft(root);
-        return root;
-    }
-    if (root->BF > 1 && temp.fips > root->left->fips) { // Left Right Case
-        root->left = rotateLeft(root->left);
-        root = rotateRight(root);
-        return root;
-    }
-    if (root->BF < -1 && temp.fips < root->right->fips) { // Right Left Case
-        root->right = rotateLeft(root->right);
-        root = rotateLeft(root);
-        return root;
-    }
-    return root;
+	if (root->BF > 1 && temp.fips < root->left->fips) { // Left Left Case
+		root = rotateRight(root);
+		return root;
+	}
+	if (root->BF < -1 && temp.fips > root->right->fips) { // Right Right Case
+		root = rotateLeft(root);
+		return root;
+	}
+	if (root->BF > 1 && temp.fips > root->left->fips) { // Left Right Case
+		root->left = rotateLeft(root->left);
+		root = rotateRight(root);
+		return root;
+	}
+	if (root->BF < -1 && temp.fips < root->right->fips) { // Right Left Case
+		root->right = rotateLeft(root->right);
+		root = rotateLeft(root);
+		return root;
+	}*/
+	return root;
 }
 
 int max(int left, int right) { // finds max of 2 numbers

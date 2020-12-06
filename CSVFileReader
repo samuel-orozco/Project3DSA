@@ -134,9 +134,13 @@ void readCSVFile(const char* filepath, Node* &root, unordered_map& m) {
             temp.date = dateOfUpdate;
             temp.county = County;
             temp.state = State;
-            temp.fips = stoi(Fips);
-            temp.cases = stoi(caseCount);
-            temp.deaths = stoi(deathCount);
+            if (Fips != "") {
+				temp.fips = stoi(Fips);
+			}
+			if (caseCount != "")
+				temp.cases = stoi(caseCount);
+			if (deathCount != "")
+				temp.deaths = stoi(deathCount);
 
             // only need to insert node into data structure
             //insert them into BST and HASH MAP

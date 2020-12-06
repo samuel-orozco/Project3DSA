@@ -105,7 +105,7 @@ int main() {
 			break;
         }
 	default: {
-			cout << "Please enter a valid command" << endl;
+			cout << "Please enter a valid command" << endl << endl;
 			break;
 		}
         }
@@ -222,7 +222,7 @@ void searchCountyBST(Node* root, string& County, vector<Node*>& v) {
 }
 void printCountyBST(vector<Node*>& v) {
 	if (v.empty())
-		cout << "No result found" << endl;
+		cout << "No result found" << endl << endl;
 	for (int i = 0; i < v.size(); i++) {
 		cout << v[i]->date << ": " << v[i]->county << ", " << v[i]->state << endl;
 		cout << "Fips: " << v[i]->fips << endl;

@@ -14,8 +14,6 @@ struct Node {
 	int cases;
 	int deaths;
 
-	// Caden's part for BST tree
-	int BF = 0;
 	Node* left = nullptr;
 	Node* right = nullptr;
 	Node() : county(""), state(""), date(""), fips(0), cases(0), deaths(0), BF(0), left(nullptr), right(nullptr) {}
@@ -35,15 +33,9 @@ struct mapNode //had to make separate node because didn't need pointers
     mapNode(string s, string d, int f, int c, int x): state(s), date(d), fips(f), cases(c), deaths(x){};
 };
 
-
 Node* BSTinsert(Node* root, Node temp);
-int max(int left, int right);
-int height(Node* root);
-int BalanceFactor(Node* root);
-Node* rotateLeft(Node* root); // left rotate of AVL Tree
-Node* rotateRight(Node* root); // right rotate of AVL Tree
-void mostCasesBST(Node* root, int& max);
-void mostDeathsBST(Node* root, int& max);
+void mostCasesBST(Node* root, int& max, Node& temp);
+void mostDeathsBST(Node* root, int& max, Node& temp);
 void totalCasesBST(Node* root, long& total);
 void totalDeathsBST(Node* root, int& total);
 void searchCountyBST(Node* root, string& County, vector<Node*>& v);
@@ -61,7 +53,8 @@ int main() {
 
     bool isRunning = true;
     int choice;
-
+    
+    
     while (isRunning) {
 
         // cout menu of user options
@@ -76,22 +69,40 @@ int main() {
             isRunning = false;
         }
         case 1: {
-            topCaseCounty();
+	    	int maxBST = 0;
+			Node max;
+			mostCasesBST(root, maxBST, max);
+			cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
+			break;
         }
         case 2: {
-            topDeathCounty();
+            int maxBST = 0;
+			Node max;
+			mostDeathsBST(root, maxBST, max);
+			cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
+			break;
         }
         case 3: {
-            overallCases();
+            long totalBST = 0;
+			totalCasesBST(root, totalBST);
+			cout << "Total Cases: " << totalBST << endl << endl;
+			break;
         }
         case 4: {
-            overallDeaths();
+            int totalBST = 0;
+			totalDeathsBST(root, totalBST);
+			cout << "Total Deaths: " << totalBST << endl << endl;
+			break;
         }
         case 5: {
-            cout << "Insert county name (using all capital letters)" << endl;
+            cout << "Insert county name (first letter capitalized)" << endl;
             string countyName;
-            cin >> countyName;
-            searchCountyName(countyName);
+			cin >> countyName;
+			
+			vector<Node*> counties;
+			searchCountyBST(root, countyName, counties);
+			printCountyBST(counties);
+			break;
         }
         }
 
@@ -149,81 +160,31 @@ Node* BSTinsert(Node* root, Node temp) {
 		root->date = temp.date;
 		return root;
 	}
-	/*
-	//Balance the AVL Tree
-	root->BF = BalanceFactor(root);
-
-	if (root->BF > 1 && temp.fips < root->left->fips) { // Left Left Case
-		root = rotateRight(root);
-		return root;
-	}
-	if (root->BF < -1 && temp.fips > root->right->fips) { // Right Right Case
-		root = rotateLeft(root);
-		return root;
-	}
-	if (root->BF > 1 && temp.fips > root->left->fips) { // Left Right Case
-		root->left = rotateLeft(root->left);
-		root = rotateRight(root);
-		return root;
-	}
-	if (root->BF < -1 && temp.fips < root->right->fips) { // Right Left Case
-		root->right = rotateLeft(root->right);
-		root = rotateLeft(root);
-		return root;
-	}*/
 	return root;
 }
 
-int max(int left, int right) { // finds max of 2 numbers
-    if (left > right)
-        return left;
-    return right;
-}
-
-int height(Node* root) { // finds height of node -> Height = 1 + max(Height(children))
-    if (root == nullptr)
-        return 0;
-    return (1 + max(height(root->left), height(root->right)));
-}
-
-int BalanceFactor(Node* root) { // calculate balance factor of node
-    return (height(root->left) - height(root->right));
-}
-
-Node* rotateLeft(Node* root) { // left rotate of AVL Tree
-    Node* grandchild = root->right->left;
-    Node* newParent = root->right;
-    newParent->left = root;
-    root->right = grandchild;
-    return newParent;
-}
-
-Node* rotateRight(Node* root) { // right rotate of AVL Tree
-    Node* grandchild = root->left->right;
-    Node* newParent = root->left;
-    newParent->right = root;
-    root->left = grandchild;
-    return newParent;
-}
-
-void mostCasesBST(Node* root, int& max) {
+void mostCasesBST(Node* root, int& max, Node& temp) {
 	if (root == nullptr)
 		cout << "";
 	else {
-		mostCasesBST(root->left, max);
-		if (root->cases > max)
+		mostCasesBST(root->left, max, temp);
+		if (root->cases > max) {
 			max = root->cases;
-		mostCasesBST(root->right, max);
+			temp = *root;
+		}
+		mostCasesBST(root->right, max, temp);
 	}
 }
-void mostDeathsBST(Node* root, int& max) {
+void mostDeathsBST(Node* root, int& max, Node& temp) {
 	if (root == nullptr)
 		cout << "";
 	else {
-		mostDeathsBST(root->left, max);
-		if (root->deaths > max)
+		mostDeathsBST(root->left, max, temp);
+		if (root->deaths > max) {
 			max = root->deaths;
-		mostDeathsBST(root->right, max);
+			temp = *root;
+		}
+		mostDeathsBST(root->right, max, temp);
 	}
 }
 void totalCasesBST(Node* root, long& total) {
@@ -256,6 +217,8 @@ void searchCountyBST(Node* root, string& County, vector<Node*>& v) {
 	}
 }
 void printCountyBST(vector<Node*>& v) {
+	if (v.empty())
+		cout << "No result found" << endl;
 	for (int i = 0; i < v.size(); i++) {
 		cout << v[i]->date << ": " << v[i]->county << ", " << v[i]->state << endl;
 		cout << "Fips: " << v[i]->fips << endl;

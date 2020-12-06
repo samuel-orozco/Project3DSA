@@ -104,6 +104,10 @@ int main() {
 			printCountyBST(counties);
 			break;
         }
+	default: {
+			cout << "Please enter a valid command" << endl;
+			break;
+		}
         }
 
     }

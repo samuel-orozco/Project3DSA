@@ -41,6 +41,11 @@ int height(Node* root);
 int BalanceFactor(Node* root);
 Node* rotateLeft(Node* root); // left rotate of AVL Tree
 Node* rotateRight(Node* root); // right rotate of AVL Tree
+Node* mostCasesBST(Node* root);
+Node* mostDeathsBST(Node* root);
+Node* totalCasesBST(Node* root);
+Node* totalDeathsBST(Node* root);
+Node* searchCountyBST(Node* root);
 
 void readCSVFile(const char* filepath, Node* &root, unordered_map& m);
 

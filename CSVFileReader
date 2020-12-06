@@ -12,9 +12,9 @@ struct Node {
 	int fips;
 	int cases;
 	int deaths;
-
 	Node* left = nullptr;
 	Node* right = nullptr;
+	
 	Node() : county(""), state(""), date(""), fips(0), cases(0), deaths(0), BF(0), left(nullptr), right(nullptr) {}
 	Node(string ct, string s, string d, int f, int c, int x) : county(ct), state(s), date(d), fips(f), cases(c), deaths(x), BF(0), left(nullptr), right(nullptr) {}
 };

@@ -41,11 +41,12 @@ int height(Node* root);
 int BalanceFactor(Node* root);
 Node* rotateLeft(Node* root); // left rotate of AVL Tree
 Node* rotateRight(Node* root); // right rotate of AVL Tree
-Node* mostCasesBST(Node* root);
-Node* mostDeathsBST(Node* root);
-Node* totalCasesBST(Node* root);
-Node* totalDeathsBST(Node* root);
-Node* searchCountyBST(Node* root);
+void mostCasesBST(Node* root, int& max);
+void mostDeathsBST(Node* root, int& max);
+void totalCasesBST(Node* root, long& total);
+void totalDeathsBST(Node* root, int& total);
+void searchCountyBST(Node* root, string& County, vector<Node*>& v);
+void printCountyBST(vector<Node*>& v);
 
 void readCSVFile(const char* filepath, Node* &root, unordered_map& m);
 
@@ -202,4 +203,62 @@ Node* rotateRight(Node* root) { // right rotate of AVL Tree
     newParent->right = root;
     root->left = grandchild;
     return newParent;
+}
+
+void mostCasesBST(Node* root, int& max) {
+	if (root == nullptr)
+		cout << "";
+	else {
+		mostCasesBST(root->left, max);
+		if (root->cases > max)
+			max = root->cases;
+		mostCasesBST(root->right, max);
+	}
+}
+void mostDeathsBST(Node* root, int& max) {
+	if (root == nullptr)
+		cout << "";
+	else {
+		mostDeathsBST(root->left, max);
+		if (root->deaths > max)
+			max = root->deaths;
+		mostDeathsBST(root->right, max);
+	}
+}
+void totalCasesBST(Node* root, long& total) {
+	if (root == nullptr)
+		cout << "";
+	else {
+		totalCasesBST(root->left, total);
+		total += root->cases;
+		totalCasesBST(root->right, total);
+	}
+}
+void totalDeathsBST(Node* root, int& total) {
+	if (root == nullptr)
+		cout << "";
+	else {
+		totalDeathsBST(root->left, total);
+		total += root->deaths;
+		totalDeathsBST(root->right, total);
+	}
+}
+void searchCountyBST(Node* root, string& County, vector<Node*>& v) {
+	if (root == nullptr)
+		cout << "";
+	else {
+		searchCountyBST(root->left, County, v);
+		if (root->county == County) {
+			v.push_back(root);
+		}
+		searchCountyBST(root->right, County, v);
+	}
+}
+void printCountyBST(vector<Node*>& v) {
+	for (int i = 0; i < v.size(); i++) {
+		cout << v[i]->date << ": " << v[i]->county << ", " << v[i]->state << endl;
+		cout << "Fips: " << v[i]->fips << endl;
+		cout << "Cases: " << v[i]->cases << endl;
+		cout << "Deaths: " << v[i]->deaths << "\n" << endl;
+	}
 }

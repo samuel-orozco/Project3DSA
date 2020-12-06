@@ -42,7 +42,6 @@ void printCountyBST(vector<Node*>& v);
 
 void readCSVFile(const char* filepath, Node* &root, unordered_map& m);
 
-
 int main() {
     Node* root = nullptr;
 
@@ -52,7 +51,6 @@ int main() {
 
     bool isRunning = true;
     int choice;
-    
     
     while (isRunning) {
 

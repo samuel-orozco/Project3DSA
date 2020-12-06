@@ -49,7 +49,7 @@ int main() {
     Node* root = nullptr;
 
     unordered_map<string, mapNode> covidTracker; //using county as key
-    
+
     readCSVFile("nameofCSVfile", root, covidTracker);
 
     bool isRunning = true;
@@ -58,29 +58,33 @@ int main() {
     while (isRunning) {
 
         // cout menu of user options
-
+        cout << "Welcome to the COVID-19 case tracker by county. Please choose from the following options." << endl;
+        cout << "1. County with most cases\n2. County with most deaths\n"
+                "3. Number of cases overall\n4. Number of deaths overall\n"
+                "5. Specific county number of cases and deaths\n0. Exit Program" << endl;
         cin >> choice;
         switch (choice) {
         case 0: {
+            cout << "Hope you got the information you needed! Stay safe Gator!" << endl;
             isRunning = false;
         }
         case 1: {
-
+            topCaseCounty();
         }
         case 2: {
-
+            topDeathCounty();
         }
         case 3: {
-
+            overallCases();
         }
         case 4: {
-
+            overallDeaths();
         }
         case 5: {
-
-        }
-        case 6: {
-
+            cout << "Insert county name (using all capital letters)" << endl;
+            string countyName;
+            cin >> countyName;
+            searchCountyName(countyName);
         }
         }
 
@@ -115,7 +119,7 @@ void readCSVFile(const char* filepath, Node* &root, unordered_map& m) {
 
             // only need to insert node into data structure
             //insert them into BST and HASH MAP
-            
+
             root = BSTinsert(root, temp);
 
             m[County] = mapNode(State, dateOfUpdate, Fips, caseCount, deathCount); //will add or update map string/node pair

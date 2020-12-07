@@ -74,6 +74,7 @@ int main() {
             "5. Specific county number of cases and deaths\n0. Exit Program" << endl;
         
         cin >> choice;
+        
         switch (choice) {
         case 0: {
             cout << "Hope you got the information you needed! Stay safe Gator!" << endl;

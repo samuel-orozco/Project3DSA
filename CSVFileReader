@@ -29,7 +29,7 @@ struct mapNode //had to make separate node because didn't need pointers
     int cases;
     int deaths;
 
-    mapNode(string ct, string s, string d, int f, int c, int x): county(ct), state(s), date(d), fips(f), cases(c), deaths(x){};
+    mapNode(string ct, string s, string d, int f, int c, int x) : county(ct), state(s), date(d), fips(f), cases(c), deaths(x) {};
 };
 
 //bst methods
@@ -49,14 +49,18 @@ int totalDeathsMap(unordered_map<int, mapNode*>& m);
 vector<mapNode*> searchCountyMap(unordered_map<int, mapNode*>& m, string& county);
 void printCountiesMap(vector<mapNode*>);
 
-void readCSVFile(const char* filepath, Node* &root, unordered_map<int, mapNode*>& m);
+void readCSVFile(const char* filepath, Node*& root, unordered_map<int, mapNode*>& m);
 
 int main() {
     Node* root = nullptr;
 
     unordered_map<int, mapNode*> covidTracker; //using fips as key
 
+    auto st = std::chrono::high_resolution_clock::now();
     readCSVFile("us-counties.txt", root, covidTracker);
+    auto fn = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = fn - st;
+    cout << "Time elapsed to take in data: " << elapsed.count() << "s\n" << endl;
 
     bool isRunning = true;
     int choice;
@@ -66,73 +70,129 @@ int main() {
         // cout menu of user options
         cout << "Welcome to the COVID-19 case tracker by county. Please choose from the following options." << endl;
         cout << "1. County with most cases\n2. County with most deaths\n"
-                "3. Number of cases overall\n4. Number of deaths overall\n"
-                "5. Specific county number of cases and deaths\n0. Exit Program" << endl;
+            "3. Number of cases overall\n4. Number of deaths overall\n"
+            "5. Specific county number of cases and deaths\n0. Exit Program" << endl;
+        
         cin >> choice;
         switch (choice) {
-            case 0: {
-                cout << "Hope you got the information you needed! Stay safe Gator!" << endl;
-                isRunning = false;
-                break;
-            }
-            case 1: {
-                int maxBST = 0;
-                mapNode* maxMap;
-                Node max;
-                mostCasesBST(root, maxBST, max);
-                maxMap = mostCasesMap(covidTracker);
-                cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
-                break;
-            }
-            case 2: {
-                int maxBST = 0;
-                mapNode* maxMap;
-                Node max;
-                mostDeathsBST(root, maxBST, max);
-                maxMap = mostDeathsMap(covidTracker);
-                cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
-                break;
-            }
-            case 3: {
-                long totalBST = 0;
-                int totalMap = 0;
-                totalCasesBST(root, totalBST);
-                totalMap = totalCasesMap(covidTracker);
-                cout << "Total Cases: " << totalBST << endl << endl;
-                break;
-            }
-            case 4: {
-                int totalBST = 0;
-                int totalMap = 0;
-                totalDeathsBST(root, totalBST);
-                totalMap = totalDeathsMap(covidTracker);
-                cout << "Total Deaths: " << totalBST << endl << endl;
-                break;
-            }
-            case 5: {
-                cout << "Insert county name (first letter capitalized)" << endl;
-                string countyName;
-                cin >> countyName;
+        case 0: {
+            cout << "Hope you got the information you needed! Stay safe Gator!" << endl;
+            isRunning = false;
+            break;
+        }
+        case 1: {
+            int maxBST = 0;
+            mapNode* maxMap;
+            Node max;
 
-                vector<Node*> counties;
-                vector<mapNode*> mapCounties;
-                searchCountyBST(root, countyName, counties);
-                mapCounties = searchCountyMap(covidTracker, countyName);
-                //printCountiesMap(mapCounties);
-                printCountyBST(counties);
-                break;
-            }
-            default: {
-                cout << "Please enter a valid command" << endl << endl;
-                break;
-            }
+            auto start = std::chrono::high_resolution_clock::now();
+            mostCasesBST(root, maxBST, max);
+            auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedBST = finish - start;
+
+            start = std::chrono::high_resolution_clock::now();
+            maxMap = mostCasesMap(covidTracker);
+            finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedMap = finish - start;
+
+            cout << max.county << ", " << max.state << ": " << maxBST << endl;
+            cout << "Elapsed time BST: " << elapsedBST.count() << "s" << endl;
+            cout << "Elapsed time Map: " << elapsedMap.count() << "s" << endl << endl;
+            break;
+        }
+        case 2: {
+            int maxBST = 0;
+            mapNode* maxMap;
+            Node max;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            mostDeathsBST(root, maxBST, max);
+            auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedBST = finish - start;
+
+            start = std::chrono::high_resolution_clock::now();
+            maxMap = mostDeathsMap(covidTracker);
+            finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedMap = finish - start;
+
+            cout << max.county << ", " << max.state << ": " << maxBST << endl;
+            cout << "Elapsed time BST: " << elapsedBST.count() << "s" << endl;
+            cout << "Elapsed time Map: " << elapsedMap.count() << "s" << endl << endl;
+            break;
+        }
+        case 3: {
+            long totalBST = 0;
+            int totalMap = 0;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            totalCasesBST(root, totalBST);
+            auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedBST = finish - start;
+
+            start = std::chrono::high_resolution_clock::now();
+            totalMap = totalCasesMap(covidTracker);
+            finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedMap = finish - start;
+
+            cout << "Total Cases: " << totalBST << endl;
+            cout << "Elapsed time BST: " << elapsedBST.count() << "s" << endl;
+            cout << "Elapsed time Map: " << elapsedMap.count() << "s" << endl << endl;
+            break;
+        }
+        case 4: {
+            int totalBST = 0;
+            int totalMap = 0;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            totalDeathsBST(root, totalBST);
+            auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedBST = finish - start;
+
+            start = std::chrono::high_resolution_clock::now();
+            totalMap = totalDeathsMap(covidTracker);
+            finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedMap = finish - start;
+
+            cout << "Total Deaths: " << totalBST << endl;
+            cout << "Elapsed time BST: " << elapsedBST.count() << "s" << endl;
+            cout << "Elapsed time Map: " << elapsedMap.count() << "s" << endl << endl;
+            break;
+        }
+        case 5: {
+            cout << "Insert county name (first letter capitalized)" << endl;
+            string countyName;
+            cin >> countyName;
+
+            vector<Node*> counties;
+            vector<mapNode*> mapCounties;
+
+            auto start = std::chrono::high_resolution_clock::now();
+            searchCountyBST(root, countyName, counties);
+            auto finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedBST = finish - start;
+
+            start = std::chrono::high_resolution_clock::now();
+            mapCounties = searchCountyMap(covidTracker, countyName);
+            finish = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> elapsedMap = finish - start;
+
+            //printCountiesMap(mapCounties);
+            printCountyBST(counties);
+            cout << "Elapsed time BST: " << elapsedBST.count() << "s" << endl;
+            cout << "Elapsed time Map: " << elapsedMap.count() << "s" << endl << endl;
+            break;
+        }
+        default: {
+            cout << "Please enter a valid command" << endl << endl;
+            break;
+        }
         }
     }
 
     return 0;
 }
 
-void readCSVFile(const char* filepath, Node* &root, unordered_map<int, mapNode*>& m) {
+void readCSVFile(const char* filepath, Node*& root, unordered_map<int, mapNode*>& m) {
     ifstream file(filepath);
     if (file.is_open()) {
         string lineFromFile;
@@ -271,9 +331,9 @@ mapNode* mostCasesMap(unordered_map<int, mapNode*>& m)
     mapNode* mostCases = m.begin()->second;
     auto it = m.begin();
 
-    while(it != m.end())
+    while (it != m.end())
     {
-        if(mostCases->cases < it->second->cases)
+        if (mostCases->cases < it->second->cases)
         {
             mostCases = it->second;
         }
@@ -288,9 +348,9 @@ mapNode* mostDeathsMap(unordered_map<int, mapNode*>& m)
     mapNode* mostDeaths = m.begin()->second;
     auto it = m.begin();
 
-    while(it != m.end())
+    while (it != m.end())
     {
-        if(mostDeaths->deaths < it->second->deaths)
+        if (mostDeaths->deaths < it->second->deaths)
         {
             mostDeaths = it->second;
         }
@@ -304,7 +364,7 @@ int totalCasesMap(unordered_map<int, mapNode*>& m)
     int totalCases = 0;
     auto it = m.begin();
 
-    while(it != m.end())
+    while (it != m.end())
     {
         totalCases += it->second->cases;
         it++;
@@ -317,7 +377,7 @@ int totalDeathsMap(unordered_map<int, mapNode*>& m)
     int totalDeaths = 0;
     auto it = m.begin();
 
-    while(it != m.end())
+    while (it != m.end())
     {
         totalDeaths += it->second->deaths;
         it++;
@@ -331,9 +391,9 @@ vector<mapNode*> searchCountyMap(unordered_map<int, mapNode*>& m, string& county
     vector<mapNode*> counties;
     auto it = m.begin();
 
-    while(it != m.end())
+    while (it != m.end())
     {
-        if(it->second->county == county)
+        if (it->second->county == county)
         {
             counties.push_back(it->second);
         }

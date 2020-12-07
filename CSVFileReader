@@ -6,19 +6,18 @@
 using namespace std;
 
 struct Node {
-	string county;
-	string state;
-	string date;
-	int fips;
-	int cases;
-	int deaths;
-	Node* left = nullptr;
-	Node* right = nullptr;
-	
-	Node() : county(""), state(""), date(""), fips(0), cases(0), deaths(0), left(nullptr), right(nullptr) {}
-	Node(string ct, string s, string d, int f, int c, int x) : county(ct), state(s), date(d), fips(f), cases(c), deaths(x), left(nullptr), right(nullptr) {}
-};
+    string county;
+    string state;
+    string date;
+    int fips;
+    int cases;
+    int deaths;
+    Node* left = nullptr;
+    Node* right = nullptr;
 
+    Node() : county(""), state(""), date(""), fips(0), cases(0), deaths(0), left(nullptr), right(nullptr) {}
+    Node(string ct, string s, string d, int f, int c, int x) : county(ct), state(s), date(d), fips(f), cases(c), deaths(x), left(nullptr), right(nullptr) {}
+};
 
 struct mapNode //had to make separate node because didn't need pointers
 {
@@ -29,9 +28,10 @@ struct mapNode //had to make separate node because didn't need pointers
     int cases;
     int deaths;
 
-    mapNode(string s, string d, int f, int c, int x): state(s), date(d), fips(f), cases(c), deaths(x){};
+    mapNode(string ct, string s, string d, int f, int c, int x): county(ct), state(s), date(d), fips(f), cases(c), deaths(x){};
 };
 
+//bst methods
 Node* BSTinsert(Node* root, Node temp);
 void mostCasesBST(Node* root, int& max, Node& temp);
 void mostDeathsBST(Node* root, int& max, Node& temp);
@@ -40,18 +40,26 @@ void totalDeathsBST(Node* root, int& total);
 void searchCountyBST(Node* root, string& County, vector<Node*>& v);
 void printCountyBST(vector<Node*>& v);
 
-void readCSVFile(const char* filepath, Node* &root, unordered_map& m);
+//map methods
+mapNode* mostCasesMap(unordered_map<int, mapNode*>& m);
+mapNode* mostDeathsMap(unordered_map<int, mapNode*>& m);
+int totalCasesMap(unordered_map<int, mapNode*>& m);
+int totalDeathsMap(unordered_map<int, mapNode*>& m);
+vector<mapNode*> searchCountyMap(unordered_map<int, mapNode*>& m, string& county);
+void printCountiesMap(vector<mapNode*>);
+
+void readCSVFile(const char* filepath, Node* &root, unordered_map<int, mapNode*>& m);
 
 int main() {
     Node* root = nullptr;
 
-    unordered_map<string, mapNode> covidTracker; //using county as key
+    unordered_map<int, mapNode*> covidTracker; //using fips as key
 
-    readCSVFile("nameofCSVfile", root, covidTracker);
+    readCSVFile("us-counties.txt", root, covidTracker);
 
     bool isRunning = true;
     int choice;
-    
+
     while (isRunning) {
 
         // cout menu of user options
@@ -61,58 +69,69 @@ int main() {
                 "5. Specific county number of cases and deaths\n0. Exit Program" << endl;
         cin >> choice;
         switch (choice) {
-        case 0: {
-            cout << "Hope you got the information you needed! Stay safe Gator!" << endl;
-            isRunning = false;
-        }
-        case 1: {
-	    	int maxBST = 0;
-			Node max;
-			mostCasesBST(root, maxBST, max);
-			cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
-			break;
-        }
-        case 2: {
-            int maxBST = 0;
-			Node max;
-			mostDeathsBST(root, maxBST, max);
-			cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
-			break;
-        }
-        case 3: {
-            long totalBST = 0;
-			totalCasesBST(root, totalBST);
-			cout << "Total Cases: " << totalBST << endl << endl;
-			break;
-        }
-        case 4: {
-            int totalBST = 0;
-			totalDeathsBST(root, totalBST);
-			cout << "Total Deaths: " << totalBST << endl << endl;
-			break;
-        }
-        case 5: {
-            cout << "Insert county name (first letter capitalized)" << endl;
-            string countyName;
-			cin >> countyName;
-			
-			vector<Node*> counties;
-			searchCountyBST(root, countyName, counties);
-			printCountyBST(counties);
-			break;
-        }
-	default: {
-			cout << "Please enter a valid command" << endl << endl;
-			break;
-		}
-        }
+            case 0: {
+                cout << "Hope you got the information you needed! Stay safe Gator!" << endl;
+                isRunning = false;
+                break;
+            }
+            case 1: {
+                int maxBST = 0;
+                mapNode* maxMap;
+                Node max;
+                mostCasesBST(root, maxBST, max);
+                maxMap = mostCasesMap(covidTracker);
+                cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
+                break;
+            }
+            case 2: {
+                int maxBST = 0;
+                mapNode* maxMap;
+                Node max;
+                mostDeathsBST(root, maxBST, max);
+                maxMap = mostDeathsMap(covidTracker);
+                cout << max.county << ", " << max.state << ": " << maxBST << endl << endl;
+                break;
+            }
+            case 3: {
+                long totalBST = 0;
+                int totalMap = 0;
+                totalCasesBST(root, totalBST);
+                totalMap = totalCasesMap(covidTracker);
+                cout << "Total Cases: " << totalBST << endl << endl;
+                break;
+            }
+            case 4: {
+                int totalBST = 0;
+                int totalMap = 0;
+                totalDeathsBST(root, totalBST);
+                totalMap = totalDeathsMap(covidTracker);
+                cout << "Total Deaths: " << totalBST << endl << endl;
+                break;
+            }
+            case 5: {
+                cout << "Insert county name (first letter capitalized)" << endl;
+                string countyName;
+                cin >> countyName;
 
+                vector<Node*> counties;
+                vector<mapNode*> mapCounties;
+                searchCountyBST(root, countyName, counties);
+                mapCounties = searchCountyMap(covidTracker, countyName);
+                //printCountiesMap(mapCounties);
+                printCountyBST(counties);
+                break;
+            }
+            default: {
+                cout << "Please enter a valid command" << endl << endl;
+                break;
+            }
+        }
     }
 
     return 0;
 }
 
-void readCSVFile(const char* filepath, Node* &root, unordered_map& m) {
+void readCSVFile(const char* filepath, Node* &root, unordered_map<int, mapNode*>& m) {
     ifstream file(filepath);
     if (file.is_open()) {
         string lineFromFile;
@@ -132,102 +151,208 @@ void readCSVFile(const char* filepath, Node* &root, unordered_map& m) {
             temp.date = dateOfUpdate;
             temp.county = County;
             temp.state = State;
-            if (Fips != "") {
-				temp.fips = stoi(Fips);
-			}
-			if (caseCount != "")
-				temp.cases = stoi(caseCount);
-			if (deathCount != "")
-				temp.deaths = stoi(deathCount);
-
+            if (Fips != "")
+            {
+                temp.fips = stoi(Fips);
+            }
+            else
+            {
+                temp.fips = 0;
+            }
+            if (caseCount != "")
+            {
+                temp.cases = stoi(caseCount);
+            }
+            else
+            {
+                temp.cases = 0;
+            }
+            if (deathCount != "" && deathCount != "\r")
+            {
+                temp.deaths = stoi(deathCount);
+            }
+            else
+            {
+                temp.deaths = 0;
+            }
             // only need to insert node into data structure
             //insert them into BST and HASH MAP
-
             root = BSTinsert(root, temp);
-
-            m[County] = mapNode(State, dateOfUpdate, Fips, caseCount, deathCount); //will add or update map string/node pair
+            m[temp.fips] = new mapNode(temp.county, temp.state, temp.date, temp.fips, temp.cases, temp.deaths); //will add or update map int/node pair
         }
     }
 }
 
 Node* BSTinsert(Node* root, Node temp) {
-	//normal insert of BST
-	if (root == nullptr) {
-		return new Node(temp.county, temp.state, temp.date, temp.fips, temp.cases, temp.deaths);
-	}
-	if (temp.fips < root->fips)
-		root->left = BSTinsert(root->left, temp);
-	else if (temp.fips > root->fips)
-		root->right = BSTinsert(root->right, temp);
-	else {
-		root->cases = temp.cases;
-		root->deaths = temp.deaths;
-		root->date = temp.date;
-		return root;
-	}
-	return root;
+    //normal insert of BST
+    if (root == nullptr) {
+        return new Node(temp.county, temp.state, temp.date, temp.fips, temp.cases, temp.deaths);
+    }
+    if (temp.fips < root->fips)
+        root->left = BSTinsert(root->left, temp);
+    else if (temp.fips > root->fips)
+        root->right = BSTinsert(root->right, temp);
+    else {
+        root->cases = temp.cases;
+        root->deaths = temp.deaths;
+        root->date = temp.date;
+        return root;
+    }
+    return root;
 }
 
 void mostCasesBST(Node* root, int& max, Node& temp) {
-	if (root == nullptr)
-		cout << "";
-	else {
-		mostCasesBST(root->left, max, temp);
-		if (root->cases > max) {
-			max = root->cases;
-			temp = *root;
-		}
-		mostCasesBST(root->right, max, temp);
-	}
+    if (root == nullptr)
+        cout << "";
+    else {
+        mostCasesBST(root->left, max, temp);
+        if (root->cases > max) {
+            max = root->cases;
+            temp = *root;
+        }
+        mostCasesBST(root->right, max, temp);
+    }
 }
 void mostDeathsBST(Node* root, int& max, Node& temp) {
-	if (root == nullptr)
-		cout << "";
-	else {
-		mostDeathsBST(root->left, max, temp);
-		if (root->deaths > max) {
-			max = root->deaths;
-			temp = *root;
-		}
-		mostDeathsBST(root->right, max, temp);
-	}
+    if (root == nullptr)
+        cout << "";
+    else {
+        mostDeathsBST(root->left, max, temp);
+        if (root->deaths > max) {
+            max = root->deaths;
+            temp = *root;
+        }
+        mostDeathsBST(root->right, max, temp);
+    }
 }
 void totalCasesBST(Node* root, long& total) {
-	if (root == nullptr)
-		cout << "";
-	else {
-		totalCasesBST(root->left, total);
-		total += root->cases;
-		totalCasesBST(root->right, total);
-	}
+    if (root == nullptr)
+        cout << "";
+    else {
+        totalCasesBST(root->left, total);
+        total += root->cases;
+        totalCasesBST(root->right, total);
+    }
 }
 void totalDeathsBST(Node* root, int& total) {
-	if (root == nullptr)
-		cout << "";
-	else {
-		totalDeathsBST(root->left, total);
-		total += root->deaths;
-		totalDeathsBST(root->right, total);
-	}
+    if (root == nullptr)
+        cout << "";
+    else {
+        totalDeathsBST(root->left, total);
+        total += root->deaths;
+        totalDeathsBST(root->right, total);
+    }
 }
 void searchCountyBST(Node* root, string& County, vector<Node*>& v) {
-	if (root == nullptr)
-		cout << "";
-	else {
-		searchCountyBST(root->left, County, v);
-		if (root->county == County) {
-			v.push_back(root);
-		}
-		searchCountyBST(root->right, County, v);
-	}
+    if (root == nullptr)
+        cout << "";
+    else {
+        searchCountyBST(root->left, County, v);
+        if (root->county == County) {
+            v.push_back(root);
+        }
+        searchCountyBST(root->right, County, v);
+    }
 }
 void printCountyBST(vector<Node*>& v) {
-	if (v.empty())
-		cout << "No result found" << endl << endl;
-	for (int i = 0; i < v.size(); i++) {
-		cout << v[i]->date << ": " << v[i]->county << ", " << v[i]->state << endl;
-		cout << "Fips: " << v[i]->fips << endl;
-		cout << "Cases: " << v[i]->cases << endl;
-		cout << "Deaths: " << v[i]->deaths << "\n" << endl;
-	}
+    if (v.empty())
+        cout << "No result found" << endl << endl;
+    for (int i = 0; i < v.size(); i++) {
+        cout << v[i]->date << ": " << v[i]->county << ", " << v[i]->state << endl;
+        cout << "Fips: " << v[i]->fips << endl;
+        cout << "Cases: " << v[i]->cases << endl;
+        cout << "Deaths: " << v[i]->deaths << "\n" << endl;
+    }
+}
+
+mapNode* mostCasesMap(unordered_map<int, mapNode*>& m)
+{
+    mapNode* mostCases = m.begin()->second;
+    auto it = m.begin();
+
+    while(it != m.end())
+    {
+        if(mostCases->cases < it->second->cases)
+        {
+            mostCases = it->second;
+        }
+        it++;
+    }
+
+    return mostCases;
+}
+
+mapNode* mostDeathsMap(unordered_map<int, mapNode*>& m)
+{
+    mapNode* mostDeaths = m.begin()->second;
+    auto it = m.begin();
+
+    while(it != m.end())
+    {
+        if(mostDeaths->deaths < it->second->deaths)
+        {
+            mostDeaths = it->second;
+        }
+        it++;
+    }
+
+    return mostDeaths;
+}
+int totalCasesMap(unordered_map<int, mapNode*>& m)
+{
+    int totalCases = 0;
+    auto it = m.begin();
+
+    while(it != m.end())
+    {
+        totalCases += it->second->cases;
+        it++;
+    }
+
+    return totalCases;
+}
+int totalDeathsMap(unordered_map<int, mapNode*>& m)
+{
+    int totalDeaths = 0;
+    auto it = m.begin();
+
+    while(it != m.end())
+    {
+        totalDeaths += it->second->deaths;
+        it++;
+    }
+
+    return totalDeaths;
+}
+
+vector<mapNode*> searchCountyMap(unordered_map<int, mapNode*>& m, string& county)
+{
+    vector<mapNode*> counties;
+    auto it = m.begin();
+
+    while(it != m.end())
+    {
+        if(it->second->county == county)
+        {
+            counties.push_back(it->second);
+        }
+        it++;
+    }
+
+    return counties;
+}
+
+void printCountiesMap(vector<mapNode*> counties)
+{
+    if (counties.empty())
+    {
+        cout << "No result found" << endl << endl;
+    }
+    for (int i = 0; i < counties.size(); i++)
+    {
+        cout << counties[i]->date << ": " << counties[i]->county << ", " << counties[i]->state << endl;
+        cout << "Fips: " << counties[i]->fips << endl;
+        cout << "Cases: " << counties[i]->cases << endl;
+        cout << "Deaths: " << counties[i]->deaths << "\n" << endl;
+    }
 }
